@@ -5,9 +5,6 @@ import { UpdateCalendarItemSchema } from "@/lib/validations/calendar";
 import { checkRateLimit, rateLimitConfigs } from "@/lib/rateLimit";
 import { createErrorResponse, ValidationError } from "@/lib/errors";
 import { logger } from "@/lib/logger";
-import { checkRateLimit, rateLimitConfigs } from "@/lib/rateLimit";
-import { createErrorResponse, ValidationError } from "@/lib/errors";
-import { logger } from "@/lib/logger";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
