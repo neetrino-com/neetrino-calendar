@@ -1,0 +1,116 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// MODELS
+// ============================================
+
+// Role: ADMIN | USER
+// CalendarItemType: MEETING | DEADLINE
+// ItemStatus: DRAFT | CONFIRMED | DONE | CANCELED
+// ParticipantRole: OWNER | PARTICIPANT | RESPONSIBLE
+// RsvpStatus: YES | NO | MAYBE
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  role      String   @default("USER") // ADMIN | USER
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  createdItems     CalendarItem[]
+  participations   CalendarItemParticipant[]
+  scheduleEntries  ScheduleEntry[]
+  createdSchedules ScheduleEntry[]           @relation("ScheduleCreator")
+  permissions      UserPermission[]
+}
+
+model CalendarItem {
+  id          String   @id @default(cuid())
+  type        String   // MEETING | DEADLINE
+  title       String
+  description String?
+  startAt     DateTime
+  endAt       DateTime?
+  allDay      Boolean  @default(false)
+  status      String   @default("DRAFT") // DRAFT | CONFIRMED | DONE | CANCELED
+  location    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  createdById  String
+  createdBy    User                      @relation(fields: [createdById], references: [id])
+  participants CalendarItemParticipant[]
+
+  @@index([startAt, endAt])
+  @@index([type])
+  @@index([status])
+}
+
+model CalendarItemParticipant {
+  id   String  @id @default(cuid())
+  role String  @default("PARTICIPANT") // OWNER | PARTICIPANT | RESPONSIBLE
+  rsvp String? // YES | NO | MAYBE
+
+  // Relations
+  itemId String
+  item   CalendarItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  userId String
+  user   User         @relation(fields: [userId], references: [id])
+
+  @@unique([itemId, userId])
+}
+
+model ScheduleEntry {
+  id        String   @id @default(cuid())
+  date      DateTime // Date only (time part ignored)
+  startTime Int // Minutes from midnight (0-1439)
+  endTime   Int // Minutes from midnight (0-1439)
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  userId      String
+  user        User   @relation(fields: [userId], references: [id])
+  createdById String
+  createdBy   User   @relation("ScheduleCreator", fields: [createdById], references: [id])
+
+  @@unique([date, userId])
+  @@index([date])
+}
+
+// ============================================
+// USER PERMISSIONS (Super Admin)
+// ============================================
+
+// PermissionLevel: NONE | VIEW | EDIT
+// Module: meetings | deadlines | schedule
+
+model UserPermission {
+  id        String   @id @default(cuid())
+  module    String   // meetings | deadlines | schedule
+  myLevel   String   @default("NONE") // NONE | VIEW | EDIT - for user's own records
+  allLevel  String   @default("NONE") // NONE | VIEW | EDIT - for all records
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, module])
+  @@index([userId])
+}

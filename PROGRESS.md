@@ -1,0 +1,158 @@
+# PROGRESS.md — Calendar + Daily Schedule Module
+
+## Хронология разработки
+
+### 22.01.2026 — Начало проекта
+
+#### 10:00 — План утверждён
+- Создан PLAN.md с полным описанием проекта
+- План утверждён пользователем
+
+#### 10:05 — Этап 1: Инициализация проекта ✅
+- [x] Создан Next.js проект с TypeScript
+- [x] Настроен Tailwind CSS
+- [x] Установлен и настроен Prisma + SQLite
+- [x] Созданы UI компоненты (shadcn-style)
+- [x] Создана структура папок
+- [x] Настроен ESLint + Prettier
+
+#### 10:20 — Этап 2: База данных ✅
+- [x] Написан Prisma schema (SQLite, без enum)
+- [x] Создана миграция
+- [x] Написан seed script с демо-данными
+- [x] Создан Prisma client singleton
+
+#### 10:30 — Этап 3: Аутентификация ✅
+- [x] Создан middleware для проверки роли
+- [x] Реализована простая сессия (mock admin)
+- [x] Helper функции для проверки доступа
+
+#### 10:40 — Этап 4: API для Calendar Items ✅
+- [x] Zod схемы валидации
+- [x] GET /api/calendar/items (с фильтрами)
+- [x] POST /api/calendar/items
+- [x] PATCH /api/calendar/items/:id
+- [x] DELETE /api/calendar/items/:id
+- [x] Логирование всех операций
+
+#### 10:50 — Этап 5: API для Schedule ✅
+- [x] Zod схемы валидации
+- [x] GET /api/schedule
+- [x] POST /api/schedule
+- [x] PATCH /api/schedule/:id
+- [x] DELETE /api/schedule/:id
+- [x] Валидация: endTime > startTime
+
+#### 11:00 — Этап 6-9: UI компоненты ✅
+- [x] Toast notifications (sonner)
+- [x] Базовые компоненты (Button, Input, Dialog, Select, etc.)
+- [x] Интеграция FullCalendar
+- [x] Переключатель Month/Week/Day
+- [x] Фильтры (статус, поиск)
+- [x] Отображение событий с цветовой кодировкой
+- [x] Клик на событие — модальное окно
+- [x] Формы создания/редактирования события
+- [x] Форма добавления/редактирования смены
+
+#### 12:00 — 3 отдельные страницы с календарями ✅
+- [x] Навигация между 3 страницами
+- [x] **/meetings** — Встречи (календарь с встречами)
+- [x] **/deadlines** — Дедлайны (календарь с дедлайнами)
+- [x] **/schedule** — График смен (календарь + панель расписания справа)
+- [x] Главная страница "/" редиректит на /meetings
+
+---
+
+## Структура страниц
+
+### 1. Встречи (/meetings)
+- Календарь с 3 режимами (Месяц/Неделя/День)
+- Показывает только встречи (MEETING)
+- Фильтр по статусу
+- Поиск по названию
+- Создание/редактирование/удаление встреч
+- Участники с RSVP
+
+### 2. Дедлайны (/deadlines)
+- Календарь с 3 режимами (Месяц/Неделя/День)
+- Показывает только дедлайны (DEADLINE)
+- Фильтр по статусу
+- Поиск по названию
+- Создание/редактирование/удаление дедлайнов
+- Ответственные лица
+
+### 3. График смен (/schedule)
+- Календарь с 3 режимами (Месяц/Неделя/День)
+- Панель справа с графиком на выбранную дату
+- Простой список: Имя + время (09:00–18:00)
+- Создание/редактирование/удаление записей
+
+---
+
+## 22.01.2026 — UI/UX Design: Super Admin Page
+
+#### 14:00 — Дизайн страницы User Access Management ✅
+- [x] Создан детальный UI/UX дизайн-документ
+- [x] Описан layout страницы (two-column: users + permissions)
+- [x] Спроектирована таблица прав доступа с Segmented Controls
+- [x] Определены состояния View/Edit/None с визуальной иерархией
+- [x] Описаны колонки My (свои записи) / Everyone (все записи)
+- [x] Спроектирован Action Bar с индикатором unsaved changes
+- [x] Добавлены hover/focus/loading/empty states
+- [x] Описана responsive адаптация (desktop/tablet/mobile)
+- [x] Определена цветовая палитра и типографика
+- [x] Создан чеклист для дизайнера (Figma)
+
+**Файл дизайна:** `docs/DESIGN_USER_ACCESS_MANAGEMENT.md`
+
+#### 17:20 — Реализация страницы Super Admin ✅
+- [x] Обновлена Prisma Schema — добавлена модель `UserPermission`
+- [x] Создана миграция `add_user_permissions`
+- [x] Создан API `/api/admin/permissions` (GET, PUT)
+- [x] Созданы UI компоненты:
+  - `PermissionSegment` — segmented control для View/Edit/None
+  - `UserCard` — карточка пользователя
+  - `UserListPanel` — панель со списком пользователей
+  - `PermissionsTable` — таблица прав доступа
+  - `ActionBar` — sticky панель с кнопками Save/Reset
+  - `UserAccessPage` — главный компонент страницы
+- [x] Создана страница `/admin/permissions`
+- [x] Добавлен Tooltip компонент (shadcn/ui)
+- [x] Обновлена навигация — добавлена ссылка "Доступ" для админов
+- [x] Обновлён seed — добавлены дефолтные права для пользователей
+
+**Страница:** `/admin/permissions` (только для Admin)
+
+---
+
+## Структура страниц (обновлено)
+
+### 4. Super Admin (/admin/permissions) — НОВОЕ
+- Управление правами доступа пользователей
+- Два scope: My (свои записи) / Everyone (все записи)
+- Три уровня доступа: View / Edit / None
+- Три модуля: Meetings / Deadlines / Schedule
+- Визуальный индикатор несохранённых изменений
+- Responsive дизайн (desktop/tablet/mobile)
+
+---
+
+## Команды для запуска
+
+```bash
+# Установка
+npm install
+
+# База данных
+npx prisma generate
+npx prisma migrate dev --name init
+npm run db:seed
+
+# Запуск
+npm run dev
+# Открыть http://localhost:3000
+```
+
+---
+
+*Последнее обновление: 22.01.2026 17:30*
