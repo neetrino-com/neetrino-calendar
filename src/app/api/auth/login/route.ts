@@ -35,7 +35,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json();
+    // Parse request body with error handling
+    let body;
+    try {
+      body = await request.json();
+    } catch (parseError) {
+      logger.error("Failed to parse request body", { error: parseError });
+      return NextResponse.json(
+        { error: "InvalidRequest", message: "Invalid request format. Please check your input." },
+        { status: 400 }
+      );
+    }
 
     // Validate input
     const validated = loginSchema.safeParse(body);

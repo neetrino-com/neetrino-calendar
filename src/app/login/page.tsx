@@ -39,7 +39,19 @@ function LoginForm() {
         }),
       });
 
-      const data = await response.json();
+      // Check if response is ok before parsing JSON
+      let data;
+      try {
+        const text = await response.text();
+        if (!text) {
+          throw new Error("Empty response from server");
+        }
+        data = JSON.parse(text);
+      } catch (parseError) {
+        console.error("[Login] Failed to parse response:", parseError);
+        setError(`Server error (${response.status}). Please try again later.`);
+        return;
+      }
 
       if (response.ok && data.user) {
         // Use window.location for full page reload to ensure cookie is set
@@ -53,12 +65,20 @@ function LoginForm() {
         console.error("[Login] Login failed:", { 
           status: response.status, 
           error: data.error,
-          message: data.message 
+          message: data.message,
+          fullResponse: data
         });
       }
     } catch (error) {
       console.error("[Login] Network error:", error);
-      setError("Network error. Please check your connection and try again.");
+      // More specific error messages
+      if (error instanceof TypeError && error.message.includes("fetch")) {
+        setError("Cannot connect to server. Please check your internet connection.");
+      } else if (error instanceof Error) {
+        setError(`Error: ${error.message}`);
+      } else {
+        setError("Network error. Please check your connection and try again.");
+      }
     } finally {
       setIsLoading(false);
     }
