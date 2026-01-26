@@ -12,12 +12,33 @@ const loginSchema = z.object({
 });
 
 /**
+ * Handle OPTIONS request for CORS preflight
+ */
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    },
+  });
+}
+
+/**
  * POST /api/auth/login - Login user by email
  * Security: Rate limited, email enumeration protection, secure cookies
  */
 export async function POST(request: NextRequest) {
   try {
-    logger.info("POST /api/auth/login");
+    logger.info("POST /api/auth/login", {
+      method: request.method,
+      url: request.url,
+      headers: {
+        contentType: request.headers.get("content-type"),
+        origin: request.headers.get("origin"),
+      },
+    });
 
     // Rate limiting (strict: 5 requests per minute)
     const rateLimitResult = checkRateLimit(request, rateLimitConfigs.strict);

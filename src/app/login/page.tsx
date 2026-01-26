@@ -30,7 +30,14 @@ function LoginForm() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/auth/login", {
+      // Use absolute URL to avoid issues on Vercel
+      const apiUrl = typeof window !== "undefined" 
+        ? `${window.location.origin}/api/auth/login`
+        : "/api/auth/login";
+      
+      console.log("[Login] Sending request to:", apiUrl);
+      
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -38,6 +45,8 @@ function LoginForm() {
           password: loginPassword,
         }),
       });
+      
+      console.log("[Login] Response status:", response.status, response.statusText);
 
       // Check if response is ok before parsing JSON
       let data;
