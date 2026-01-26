@@ -5,6 +5,9 @@ import { checkRateLimit, rateLimitConfigs } from "@/lib/rateLimit";
 import { createErrorResponse } from "@/lib/errors";
 import { logger } from "@/lib/logger";
 
+// Explicitly set runtime to nodejs (required for Prisma on Vercel)
+export const runtime = "nodejs";
+
 /**
  * GET /api/users - Get all users (for select dropdowns)
  * Security: Rate limited, authenticated only, pagination limited

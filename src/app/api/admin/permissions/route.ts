@@ -6,6 +6,9 @@ import { checkRateLimit, rateLimitConfigs } from "@/lib/rateLimit";
 import { createErrorResponse, ValidationError } from "@/lib/errors";
 import { logger, securityLogger } from "@/lib/logger";
 
+// Explicitly set runtime to nodejs (required for Prisma on Vercel)
+export const runtime = "nodejs";
+
 // Validation schema for updating permissions
 const updatePermissionsSchema = z.object({
   userId: z.string().min(1, "User ID is required"),

@@ -7,6 +7,9 @@ import { createErrorResponse, ValidationError } from "@/lib/errors";
 import { logger } from "@/lib/logger";
 import { getScheduleEntriesFilter } from "@/lib/authorize";
 
+// Explicitly set runtime to nodejs (required for Prisma on Vercel)
+export const runtime = "nodejs";
+
 /**
  * GET /api/schedule - Get schedule entries for a specific date
  * Security: Rate limited, authorization filtered, pagination limited

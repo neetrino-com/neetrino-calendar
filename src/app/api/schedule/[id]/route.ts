@@ -6,6 +6,9 @@ import { checkRateLimit, rateLimitConfigs } from "@/lib/rateLimit";
 import { createErrorResponse, ValidationError } from "@/lib/errors";
 import { logger } from "@/lib/logger";
 
+// Explicitly set runtime to nodejs (required for Prisma on Vercel)
+export const runtime = "nodejs";
+
 type RouteParams = { params: Promise<{ id: string }> };
 
 /**

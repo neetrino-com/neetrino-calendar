@@ -7,6 +7,9 @@ import { createErrorResponse, ValidationError, UnauthorizedError } from "@/lib/e
 import { logger } from "@/lib/logger";
 import { getCalendarItemsFilter } from "@/lib/authorize";
 
+// Explicitly set runtime to nodejs (required for Prisma on Vercel)
+export const runtime = "nodejs";
+
 /**
  * GET /api/calendar/items - Get calendar items with filters
  * Security: Rate limited, authorization filtered, pagination limited
