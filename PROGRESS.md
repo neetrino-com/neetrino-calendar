@@ -168,6 +168,14 @@ npm run dev
 
 **Результат:** Сборка проекта проходит успешно (`npm run build` ✅)
 
+#### 08:40 — Исправлена ошибка middleware на Vercel ✅
+- [x] Удалены импорты `db` и `logger` из middleware (несовместимы с Edge Runtime)
+- [x] Упрощен middleware для работы в Edge Runtime
+- [x] Middleware теперь использует только Edge-совместимые API Next.js
+
+**Проблема:** `MIDDLEWARE_INVOCATION_FAILED` на Vercel из-за использования Prisma в Edge Runtime  
+**Решение:** Убраны все тяжелые зависимости из middleware, используется только проверка cookies
+
 ---
 
-*Последнее обновление: 26.01.2026 08:30*
+*Последнее обновление: 26.01.2026 08:40*
