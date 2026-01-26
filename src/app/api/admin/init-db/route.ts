@@ -3,6 +3,9 @@ import { db } from "@/lib/db";
 import { hashPassword } from "@/lib/password";
 import { logger } from "@/lib/logger";
 
+// Explicitly set runtime to nodejs (required for Prisma on Vercel)
+export const runtime = "nodejs";
+
 /**
  * POST /api/admin/init-db - Initialize database with seed data
  * This endpoint should be called once after deployment to Vercel

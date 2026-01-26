@@ -3,6 +3,9 @@ import { getCurrentUser } from "@/lib/auth";
 import { checkRateLimit, rateLimitConfigs } from "@/lib/rateLimit";
 import { logger } from "@/lib/logger";
 
+// Explicitly set runtime to nodejs (required for Prisma on Vercel)
+export const runtime = "nodejs";
+
 /**
  * GET /api/auth/me - Get current user
  * Security: Rate limited
@@ -43,7 +46,20 @@ export async function GET(request: NextRequest) {
 
     return response;
   } catch (error) {
-    logger.error("Error getting current user", { error });
-    return NextResponse.json({ user: null });
+    logger.error("Error getting current user", { 
+      error: error instanceof Error ? {
+        name: error.name,
+        message: error.message,
+        stack: error.stack,
+      } : error 
+    });
+    // Return proper error response instead of null user
+    return NextResponse.json(
+      { 
+        user: null,
+        error: error instanceof Error ? error.message : "Unknown error"
+      },
+      { status: 500 }
+    );
   }
 }

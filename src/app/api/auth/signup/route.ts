@@ -6,6 +6,9 @@ import { logger, securityLogger } from "@/lib/logger";
 import { hashPassword, validatePasswordStrength } from "@/lib/password";
 import { z } from "zod";
 
+// Explicitly set runtime to nodejs (required for Prisma on Vercel)
+export const runtime = "nodejs";
+
 const signupSchema = z.object({
   name: z.string().min(1, "Name is required").max(255, "Name is too long"),
   email: z.string().email("Invalid email format"),
