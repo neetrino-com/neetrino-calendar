@@ -8,9 +8,14 @@ import type { NextRequest } from "next/server";
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
+  // Skip all API routes - they handle authentication themselves
+  if (pathname.startsWith("/api/")) {
+    return NextResponse.next();
+  }
+
   // Public pages (no auth required)
   const publicPaths = ["/login"];
-  if (publicPaths.includes(pathname) || pathname.startsWith("/api/auth/")) {
+  if (publicPaths.includes(pathname)) {
     return NextResponse.next();
   }
 

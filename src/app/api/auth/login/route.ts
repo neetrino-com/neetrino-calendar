@@ -183,6 +183,9 @@ export async function POST(request: NextRequest) {
       }
     }
     
-    return createErrorResponse(error);
+    // Always return JSON, never HTML
+    const errorResponse = createErrorResponse(error);
+    errorResponse.headers.set("Content-Type", "application/json");
+    return errorResponse;
   }
 }

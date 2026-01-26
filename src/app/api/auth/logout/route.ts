@@ -40,6 +40,8 @@ export async function POST(request: NextRequest) {
     return response;
   } catch (error) {
     logger.error("Error logging out", { error });
-    return createErrorResponse(error);
+    const errorResponse = createErrorResponse(error);
+    errorResponse.headers.set("Content-Type", "application/json");
+    return errorResponse;
   }
 }

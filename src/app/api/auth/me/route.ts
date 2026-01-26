@@ -46,6 +46,7 @@ export async function GET(request: NextRequest) {
 
     return response;
   } catch (error) {
+    // Log detailed error for debugging
     logger.error("Error getting current user", { 
       error: error instanceof Error ? {
         name: error.name,
@@ -53,13 +54,35 @@ export async function GET(request: NextRequest) {
         stack: error.stack,
       } : error 
     });
-    // Return proper error response instead of null user
+    
+    // Check if it's a database connection error
+    if (error instanceof Error) {
+      const errorMessage = error.message.toLowerCase();
+      if (errorMessage.includes("prisma") || errorMessage.includes("database") || errorMessage.includes("connection")) {
+        logger.error("Database connection error in /api/auth/me", { error: error.message });
+        return NextResponse.json(
+          { 
+            user: null,
+            error: "DatabaseError",
+            message: "Database connection error. If you're on Vercel, the database may need to be initialized. Please call /api/admin/init-db first."
+          },
+          { status: 500 }
+        );
+      }
+    }
+    
+    // Return proper error response - always JSON, never HTML
     return NextResponse.json(
       { 
         user: null,
         error: error instanceof Error ? error.message : "Unknown error"
       },
-      { status: 500 }
+      { 
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+        }
+      }
     );
   }
 }

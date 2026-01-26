@@ -243,6 +243,23 @@ npm run dev
 
 **Важно:** После этого коммита нужно сделать **Redeploy** на Vercel, чтобы изменения вступили в силу!
 
+#### 13:10 — Исправлены ошибки API и сборки на Vercel ✅
+- [x] Добавлен `export const dynamic = "force-dynamic"` в `/admin/permissions` для исправления ошибки статической генерации
+- [x] Улучшена обработка ошибок в `/api/auth/me` с детальными сообщениями о проблемах БД
+- [x] Исправлен middleware — теперь явно пропускает все `/api/` routes в начале функции
+- [x] Добавлены заголовки `Content-Type: application/json` во все API routes для гарантии JSON ответов
+- [x] Создан `app/icon.tsx` для favicon (использует Next.js ImageResponse API)
+- [x] Улучшена обработка ошибок в `/api/auth/login`, `/api/auth/signup`, `/api/auth/logout`
+
+**Проблемы, которые были исправлены:**
+- 500 ошибка на `/api/auth/me` — теперь возвращает корректный JSON с информацией об ошибке БД
+- 405 ошибка на `/api/auth/login` — middleware теперь не блокирует API запросы
+- HTML вместо JSON — все API routes теперь явно устанавливают Content-Type
+- 404 для favicon.ico — создан динамический favicon через `app/icon.tsx`
+- Ошибка сборки "Route /admin/permissions couldn't be rendered statically" — исправлена через `force-dynamic`
+
+**Важно:** После этого коммита нужно сделать **Redeploy** на Vercel, чтобы изменения вступили в силу!
+
 ---
 
-*Последнее обновление: 26.01.2026 10:30*
+*Последнее обновление: 26.01.2026 13:10*
