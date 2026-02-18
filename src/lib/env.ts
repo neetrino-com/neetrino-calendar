@@ -71,13 +71,17 @@ export const env = (() => {
     return envSchema.parse(envData);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      // During build, allow missing AUTH_SECRET (it will be required at runtime)
       const buildTime = isBuildTime();
       const missingAuthSecret = error.issues.some(e => e.path.includes("AUTH_SECRET"));
-      
-      if (buildTime && missingAuthSecret) {
-        console.warn("⚠️  AUTH_SECRET not set during build - using placeholder. Make sure to set it in Vercel environment variables!");
-        // Return a valid env object with placeholder for build
+      const isVercelRuntime = process.env.VERCEL === "1" && process.env.VERCEL_ENV;
+
+      // During build, or on Vercel at runtime without AUTH_SECRET: use placeholder so the app loads and returns JSON (not HTML 500)
+      if ((buildTime || isVercelRuntime) && missingAuthSecret) {
+        if (isVercelRuntime) {
+          console.warn("⚠️  AUTH_SECRET not set on Vercel - using placeholder. Set AUTH_SECRET in Vercel Environment Variables for production.");
+        } else if (buildTime) {
+          console.warn("⚠️  AUTH_SECRET not set during build - using placeholder. Make sure to set it in Vercel environment variables!");
+        }
         return envSchema.parse({
           DATABASE_URL: process.env.DATABASE_URL || (process.env.VERCEL ? "file::memory:?cache=shared" : "file:./dev.db"),
           AUTH_SECRET: "build-time-placeholder-min-32-chars-long-required",
@@ -86,7 +90,7 @@ export const env = (() => {
           ENABLE_CSRF_PROTECTION: process.env.ENABLE_CSRF_PROTECTION,
         });
       }
-      
+
       const missingVars = error.issues.map((e) => `${e.path.join(".")}: ${e.message}`).join("\n");
       throw new Error(
         `❌ Invalid environment variables:\n${missingVars}\n\nPlease check your .env file or Vercel environment variables.`
